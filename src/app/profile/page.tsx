@@ -71,7 +71,14 @@ export default async function ProfilePage() {
         </p>
       </div>
 
+      {/* Keyed on updated_at so a save (which revalidates this page but
+          keeps the same component instance) forces a remount -- Base
+          UI's Checkbox/Select are uncontrolled, so a defaultChecked/
+          defaultValue prop change on an already-mounted instance is a
+          no-op and would otherwise leave the form showing stale values
+          while silently submitting whatever was on screen before. */}
       <ProfileDetailsForm
+        key={profile.updated_at}
         profile={profile}
         contactEmail={contact?.contact_email ?? ""}
         timezones={listTimezones()}
@@ -81,6 +88,10 @@ export default async function ProfilePage() {
 
       {profile.is_mentor && (
         <SkillsPicker
+          // Same remount-on-change reasoning as ProfileDetailsForm above,
+          // keyed on the actual selection so a save re-syncs the checked
+          // state shown here with what's really in mentor_skills.
+          key={"mentor:" + (mentorSkills ?? []).map((s) => s.skill_id).sort().join(",")}
           title="Skills you can mentor in"
           description="Shown on your public profile and used for mentor search."
           categories={categories ?? []}
@@ -92,6 +103,7 @@ export default async function ProfilePage() {
 
       {profile.is_mentee && (
         <SkillsPicker
+          key={"mentee:" + (menteeInterests ?? []).map((s) => s.skill_id).sort().join(",")}
           title="What you'd like mentoring in"
           description="Private — only you and admins can see this."
           categories={categories ?? []}

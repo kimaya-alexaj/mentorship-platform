@@ -22,7 +22,7 @@ export default function SignupPage() {
 
   if (state.emailSentTo) {
     return (
-      <div className="mx-auto flex min-h-[70vh] max-w-md items-center px-4">
+      <div className="mx-auto flex w-full min-h-[70vh] max-w-md items-center px-4">
         <Card className="w-full">
           <CardHeader>
             <CardTitle>Check your email</CardTitle>
@@ -37,7 +37,7 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-[70vh] max-w-md items-center px-4">
+    <div className="mx-auto flex w-full min-h-[70vh] max-w-md items-center px-4">
       <Card className="w-full">
         <CardHeader>
           <CardTitle>Create your account</CardTitle>
