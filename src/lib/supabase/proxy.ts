@@ -37,7 +37,9 @@ export async function updateSession(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
   const isAuthRoute = path.startsWith("/login") || path.startsWith("/signup");
-  const isPublicRoute = path === "/" || isAuthRoute;
+  // /auth/confirm must stay reachable while signed out — it's the route
+  // that establishes the session from an emailed confirmation link.
+  const isPublicRoute = path === "/" || isAuthRoute || path.startsWith("/auth/");
 
   if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone();
