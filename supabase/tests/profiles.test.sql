@@ -53,8 +53,18 @@ select is(
 
 -- Nobody can flip is_adult_confirmed to false (defense in depth beyond
 -- the sign-up trigger).
+--
+-- throws_ok(sql, arg2, arg3) auto-detects arg2 as a 5-char SQLSTATE vs.
+-- a message purely by octet_length(arg2) = 5, and when it *is* 5 chars
+-- it forwards arg3 into the errmsg slot (not description) and description
+-- comes out NULL -- verified by reading the extension's own source
+-- (pg_get_functiondef) after this tripped up '23514' as a shorthand for
+-- "code + free-text description". So: match the literal constraint
+-- violation message instead, which is long enough to route through the
+-- errmsg branch with arg3 correctly landing as the description.
 select throws_ok(
   $$ update public.profiles set is_adult_confirmed = false where id = tests.uid('bob') $$,
+  'new row for relation "profiles" violates check constraint "profiles_is_adult_confirmed_check"',
   'is_adult_confirmed cannot be set back to false'
 );
 

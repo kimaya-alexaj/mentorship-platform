@@ -11,9 +11,14 @@ select lives_ok(
   'a user can add their own availability slot'
 );
 
+-- A 5-char 2nd arg like a SQLSTATE code doesn't get free-text
+-- description as arg3 here (verified against pgTAP's own source) -- it
+-- forwards arg3 into the errmsg slot too. Match the literal constraint
+-- violation message instead.
 select throws_ok(
   $$ insert into public.availability (profile_id, day_of_week, start_time_utc, end_time_utc)
      values (tests.uid('mentor1'), 1, '11:00', '09:00') $$,
+  'new row for relation "availability" violates check constraint "availability_check"',
   'end_time_utc must be after start_time_utc'
 );
 

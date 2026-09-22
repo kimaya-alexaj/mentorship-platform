@@ -18,12 +18,16 @@ select lives_ok(
   'a user can file a report against another user'
 );
 
--- A report must reference a user or a match.
+-- A report must reference a user or a match. A 5-char 2nd arg like a
+-- SQLSTATE code doesn't get free-text description as arg3 here (verified
+-- against pgTAP's own source) -- match the literal constraint violation
+-- message instead.
 select throws_ok(
   format(
     $$ insert into public.reports (reporter_id, reason) values (%L, 'No target') $$,
     tests.uid('reporter')
   ),
+  'new row for relation "reports" violates check constraint "reports_check"',
   'a report with neither a reported user nor a match is rejected'
 );
 
