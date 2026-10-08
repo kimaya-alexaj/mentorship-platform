@@ -27,3 +27,22 @@ export const loginSchema = z.object({
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().trim().email("Enter a valid email address."),
+});
+
+// Same length rules as signup's password so a reset can't set something
+// sign-up would have rejected.
+export const resetPasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, "Use at least 8 characters.")
+      .max(128, "Keep it under 128 characters."),
+    confirmPassword: z.string(),
+  })
+  .refine((v) => v.password === v.confirmPassword, {
+    path: ["confirmPassword"],
+    error: "Passwords don't match.",
+  });

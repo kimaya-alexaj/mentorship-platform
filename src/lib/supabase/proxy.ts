@@ -39,7 +39,17 @@ export async function updateSession(request: NextRequest) {
   const isAuthRoute = path.startsWith("/login") || path.startsWith("/signup");
   // /auth/confirm must stay reachable while signed out — it's the route
   // that establishes the session from an emailed confirmation link.
-  const isPublicRoute = path === "/" || isAuthRoute || path.startsWith("/auth/");
+  //
+  // /forgot-password and /reset-password are public but deliberately NOT
+  // "auth routes": the recovery link signs the user in, so /reset-password
+  // must stay reachable while signed in (an auth route would bounce them
+  // to /profile before they could set a new password).
+  const isPublicRoute =
+    path === "/" ||
+    isAuthRoute ||
+    path.startsWith("/auth/") ||
+    path.startsWith("/forgot-password") ||
+    path.startsWith("/reset-password");
 
   if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone();
